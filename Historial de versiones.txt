@@ -1,0 +1,11 @@
+[Version 5.3 (01-09-2021)]
+- Se modifico funcion para registrar usuarios, ahora se les agrego un campo de nombre completo.
+
+[Version 5.2 (01-09-2021)]
+- Se añadio funciones para respaldar los datos en la carpeta "respaldo_datos"
+
+[Version 5.1 (23-8-2021)]
+- Se añadio funciones para buscar los productos de la empresa, ya sea por descripcion o por codigo.
+
+[Version 5.0 (old)]
+- Se añadio funcion para anular ordenes.

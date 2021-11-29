@@ -1,0 +1,13 @@
+1;2021-08-20;No asignado;\N;9;CAMBIO;Porque, se le cayo;DIMENSIONADO;{"cantidades": [2.0, 1.0, 1.0, 1.0], "descripciones": ["dim", "test bro", "asdaksdka asdlas", "melamina nose k"], "valores_neto": [12.0, 12.0, 12.0, 12.0]};no cambiarlo
+2;2021-08-20;FACTURA;1222;9;CAMBIO;Porque, 1212;DIMENSIONADO;{"cantidades": [1.0], "descripciones": ["dim"], "valores_neto": [12.0]};algo
+3;2021-08-20;No asignado;\N;6;DEVOLUCION;Porque, KIERE LA DEVOLUCION UU;CARPINTERIA;{"cantidades": [1.0, 1.0, 1.0], "descripciones": ["CARP", "CARP 2", " ASKDASD AKSDK LOCKO LSE MAC MANDP LOCOA SLASKD ALAO LIM | SALTO DELINEA  LOCO LOCO"], "valores_neto": [1.0, 2.0, 3.0]};ACEPATAER LA DEVOLUCOION
+4;2021-08-20;FACTURA;177559;12000;QUIERE UN CAMBIO Y DESCUENTO;Porque, EL LO PIDE;ELABORACION;{"cantidades": [1.0], "descripciones": ["ELAB"], "valores_neto": [12.0]};ACEPTAR EL MOTIVO
+5;2021-08-20;No asignado;0;1001;DEVOLUCION;Porque, SI;DIMENSIONADO;{"cantidades": [4.0], "descripciones": ["MELAMINA"], "valores_neto": [123000.0]};NADA K HACER
+6;2021-08-20;FACTURA;60060;4;QUIERE UN DESCENTO EL BRO;Porque, XD;PALLETS;{"cantidades": [12.0], "descripciones": ["pallets manual con corte veredicto"], "valores_neto": [445000.0]};DDX
+7;2021-08-20;FACTURA;190866;3;DEVOLUCION;Porque, NOSE;CARPINTERIA;{"cantidades": [10.0, 1.0], "descripciones": ["OREGON EN 4,00 MTS.C/REB VIDR (2x2 CEPILLADO)                                  ", "COTO QL"], "valores_neto": [110336.13, 1.0]};DARLE OTRA PIEZA
+8;2021-08-23;FACTURA;150600;15;CAMBIO;Porque, aceptar ;DIMENSIONADO;{"cantidades": [2.0, 1.0], "descripciones": ["MELAMINA VESTO BLANCA 183 X 250 X 15 MM.CORTADAS                               ", "msd xd"], "valores_neto": [65462.18, 222000.0]};nada
+9;2021-08-23;No asignado;\N;16;RUPTURA XD;Porque, NADA;DIMENSIONADO;{"cantidades": [1.0, 1.0], "descripciones": ["VIGA REC. LAMINADA PINO 65 X 304 X 4200", "GANCHO CHOLGUAN PERFORADO 25MMX150MM "], "valores_neto": [222.0, 2333.0]};PEGARLE AL SUEDL
+10;2021-08-23;FACTURA;150600;5;CAMBIO;Porque, NI IDEA;ELABORACION;{"cantidades": [2.0], "descripciones": ["ITEM ELAB NORMAL"], "valores_neto": [65462.18]};XD
+11;2021-08-23;No asignado;\N;6;CAMBIO;Porque, XDDDDDDDDDD;ELABORACION;{"cantidades": [1.0], "descripciones": ["ELAB DE MESA"], "valores_neto": [22.0]};LOLLLLLL
+12;2021-08-23;No asignado;\N;10;CAMBIO;Porque, CARP;CARPINTERIA;{"cantidades": [1.0], "descripciones": ["\\"FRESA RECTA 1/2\\"\\" D.127MM  CORTE 19MM\\""], "valores_neto": [2.0]};CARP XD LOL
+13;2021-08-23;No asignado;\N;8;DEVOLUCION;Porque, SABE;PALLETS;{"cantidades": [22.0], "descripciones": ["PALLETS MAD. PINO INSIGNE"], "valores_neto": [5555.0]};SAPBEEEEE XD

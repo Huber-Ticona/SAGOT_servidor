@@ -1,0 +1,8 @@
+----- CONSULTAS PARA RESPALDAR --------
+
+* reingreso:
+- LOAD DATA LOCAL INFILE 'C:/Users/super/Desktop/reingreso.csv' 
+- INTO TABLE reingreso  
+- FIELDS TERMINATED BY ';' 
+- LINES TERMINATED BY '\n' 
+- (nro_reingreso, fecha, tipo_doc, nro_doc, nro_orden, motivo, descripcion, proceso, detalle, solucion) ;

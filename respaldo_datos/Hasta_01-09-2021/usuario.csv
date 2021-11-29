@@ -1,0 +1,9 @@
+1;huber;123;959430388;2021-07-08;\N;ACTIVO;SI;vendedor;{"area": [], "vendedor": ["informes"]}
+2;byron;111;666;2021-07-08;2021-07-08;NO ACTIVO;NO;area;{"area": ["dimensionado", "pallets"], "vendedor": []}
+3;juan ALBERTO;222;1121212;2021-07-08;\N;ACTIVO;NO;area;{"area": ["dimensionado", "pallets"], "vendedor": []}
+4;marcos;123;9123123;2021-07-08;\N;ACTIVO;NO;vendedor;{"area": [], "vendedor": ["manual", "informes"]}
+5;jose;123;900;2021-07-08;\N;ACTIVO;NO;vendedor;{"area": [], "vendedor": []}
+6;luis;123;9000;2021-07-08;\N;ACTIVO;NO;vendedor;{"area": [], "vendedor": ["manual"]}
+7;carlos;123;9871723;2021-07-15;\N;ACTIVO;NO;area;{"area": ["dimensionado", "elaboracion", "carpinteria", "pallets"], "vendedor": []}
+8;pedro;123;91881231;2021-07-15;\N;ACTIVO;NO;area;{"area": ["pallets"], "vendedor": []}
+9;huber ticona;123;999888;2021-08-05;\N;ACTIVO;SI;vendedor;{"area": [], "vendedor": ["manual", "informes"]}
