@@ -13,6 +13,7 @@ from concurrent.futures import ThreadPoolExecutor
 from rpyc.utils.server import ThreadedServer 
 import logging
 from shutil import rmtree
+import json
 
 logging.basicConfig(level=logging.DEBUG , format='%(threadName)s: %(message)s')
 
@@ -104,28 +105,28 @@ class MyService(rpyc.Service):
                     return False        
         finally:
                 miConexion.close()
-
+    #v5.4 se agrego el nombre
     def exposed_buscar_venta_fecha(self, inicio , fin): #USADA POR EL CLIENTE1
         miConexion = pymysql.connect( host='localhost',
         user= 'huber', passwd='huber123', db='madenco' )
         try:
             with miConexion.cursor() as cursor:
                 
-                sql = "SELECT interno,fecha,vendedor , folio, nro_boleta , monto_total FROM nota_venta WHERE fecha BETWEEN (%s) AND (%s) "
+                sql = "SELECT interno,fecha,vendedor , folio, nro_boleta , monto_total, nombre FROM nota_venta WHERE fecha BETWEEN (%s) AND (%s) "
                 cursor.execute(sql , (inicio , fin))
                 resultado = cursor.fetchall()       
                 return resultado
                   
         finally:
                 miConexion.close()
-
+    #v5.4 se agrego el nombre
     def exposed_buscar_venta_interno(self,interno): #USADA POR EL CLIENTE1
         miConexion = pymysql.connect( host='localhost',
         user= 'huber', passwd='huber123', db='madenco' )
         try:
             with miConexion.cursor() as cursor:
                 
-                sql = "SELECT interno, fecha , vendedor, folio, nro_boleta , monto_total  FROM nota_venta WHERE interno = %s " #V4
+                sql = "SELECT interno, fecha , vendedor, folio, nro_boleta , monto_total, nombre  FROM nota_venta WHERE interno = %s " #V4
                 cursor.execute(sql , (interno))
                 
                 resultado = cursor.fetchone()
@@ -974,6 +975,63 @@ class MyService(rpyc.Service):
                     return False        
         finally:
                 miConexion.close()
+    # version 5.4 
+    def exposed_obtener_guia_fecha(self,inicio , fin):
+        miConexion = pymysql.connect( host='localhost',
+        user= 'huber', passwd='huber123', db='madenco' )
+        try:
+            with miConexion.cursor() as cursor:
+                
+                sql = "SELECT * FROM guia WHERE fecha BETWEEN (%s) AND (%s) "
+                cursor.execute(sql , (inicio , fin))
+                resultado = cursor.fetchall()       
+                return resultado
+                  
+        finally:
+                miConexion.close()
+    def exposed_obtener_guia_interno(self,interno):
+        miConexion = pymysql.connect( host='localhost',
+        user= 'huber', passwd='huber123', db='madenco' )
+        try:
+            with miConexion.cursor() as cursor:
+                print('buscando guia')
+                sql = "SELECT * FROM guia WHERE interno = %s "
+                cursor.execute(sql , (interno))
+                resultado = cursor.fetchone()
+                if resultado != None:
+                    print(resultado)
+                    return resultado
+                else:
+                    return None   
+        finally:
+                miConexion.close()
+    def exposed_obtener_venta_nombre(self, nombre):
+        miConexion = pymysql.connect( host='localhost',
+        user= 'huber', passwd='huber123', db='madenco' )
+        try:
+            with miConexion.cursor() as cursor:
+                
+                sql = "SELECT interno, fecha,vendedor , folio, nro_boleta , monto_total, nombre FROM nota_venta where nombre like '%" +nombre + "%' "
+                cursor.execute(sql)
+                resultado = cursor.fetchall()       
+                return resultado
+        finally:
+                miConexion.close()
+
+    def exposed_obtener_guia_nombre(self, nombre):
+        miConexion = pymysql.connect( host='localhost',
+        user= 'huber', passwd='huber123', db='madenco' )
+        try:
+            with miConexion.cursor() as cursor:
+                
+                sql = "SELECT * from guia WHERE nombre like '%" + nombre + "%' "
+                cursor.execute(sql)
+                resultado = cursor.fetchall()       
+                return resultado
+                  
+        finally:
+                miConexion.close()
+
     
     def exposed_registrar_nota_credito(self,folio,interno,fecha,nombre,detalle):
         miConexion = pymysql.connect( host= 'localhost',
@@ -1008,6 +1066,131 @@ class MyService(rpyc.Service):
                     return False        
         finally:
                 miConexion.close()
+
+    def exposed_añadir_vinculo_credito_a_venta(self, tipo_doc, folio,folio_credito):
+        miConexion = pymysql.connect( host='localhost',
+        user= 'huber', passwd='huber123', db='madenco' )
+        try:
+            with miConexion.cursor() as cursor:
+                print('buscando si existe vnculacion')
+                if tipo_doc == 'FACTURA':
+                    sql = "SELECT vinculaciones FROM nota_venta WHERE folio = %s "
+                    cursor.execute(sql , (folio))
+                    resultado = cursor.fetchone()
+                elif tipo_doc == 'BOLETA':
+                    sql = "SELECT vinculaciones FROM nota_venta WHERE nro_boleta = %s "
+                    cursor.execute(sql , (folio))
+                    resultado = cursor.fetchone()
+                else:
+                    print('NO ES NOTA_DE VENTA, posiblemente una guia')
+                    resultado = None
+                print(resultado)
+
+                if resultado != None:
+                    print('nota venta encontrada')
+                    if resultado[0] != None:
+                        print('tiene vinculaciones, procediendo a añadir credito')
+                        vinculaciones = json.loads(resultado[0])
+                        try:
+                            vinculaciones["creditos"].append(folio_credito)
+
+                        except KeyError:
+                            print('Vinculo a credito no encontrado, creando el vinculo.,.')
+                            lista = []
+                            lista.append(folio_credito)
+                            vinculaciones["creditos"] = lista
+                        vinculaciones = json.dumps(vinculaciones)
+                        
+                    else:
+                        print('No tiene vnculaciones')
+                        lista = []
+                        lista.append(folio_credito)
+                        detalle = {
+                            "creditos" : lista
+                        }
+                        vinculaciones = json.dumps(detalle)
+                    print(vinculaciones)
+                    
+                    if tipo_doc == 'FACTURA':
+                        sql2 = 'update nota_venta set vinculaciones = %s where folio = %s'
+                        cursor.execute(sql2 , (vinculaciones,folio))
+                        miConexion.commit()
+
+                    elif tipo_doc == 'BOLETA':
+                        sql2 = 'update nota_venta set vinculaciones = %s where nro_boleta = %s'
+                        cursor.execute(sql2 , (vinculaciones,folio))
+                        miConexion.commit()
+                    print('VINCULO CREDITO AÑADIDO CORRECTAMENTE')
+                    return True
+                    
+                else:
+                    print('Nota venta NO encontrada')
+                    return False        
+        finally:
+                miConexion.close()
+    def exposed_añadir_vinculo_guia_a_venta(self, tipo_doc, folio, folio_guia):
+        miConexion = pymysql.connect( host='localhost',
+        user= 'huber', passwd='huber123', db='madenco' )
+        try:
+            with miConexion.cursor() as cursor:
+                print('buscando si existe vinculacion')
+                if tipo_doc == 'FACTURA':
+                    sql = "SELECT vinculaciones FROM nota_venta WHERE folio = %s "
+                    cursor.execute(sql , (folio))
+                    resultado = cursor.fetchone()
+                elif tipo_doc == 'BOLETA':
+                    sql = "SELECT vinculaciones FROM nota_venta WHERE nro_boleta = %s "
+                    cursor.execute(sql , (folio))
+                    resultado = cursor.fetchone()
+                else:
+                    print('NO ES NOTA_DE VENTA, posiblemente una guia')
+                    resultado = None
+                print(resultado)
+
+                if resultado != None:
+                    print('nota venta encontrada')
+                    if resultado[0] != None:
+                        print('tiene vinculaciones, procediendo a añadir guia')
+                        vinculaciones = json.loads(resultado[0])
+                        try:
+                            vinculaciones["guias"].append(folio_guia)
+
+                        except KeyError:
+                            print('Vinculo a guia no encontrado, creando el vinculo.,.')
+                            lista = []
+                            lista.append(folio_guia)
+                            vinculaciones["guias"] = lista
+                        vinculaciones = json.dumps(vinculaciones)
+                        
+                    else:
+                        print('No tiene vnculaciones')
+                        lista = []
+                        lista.append(folio_guia)
+                        detalle = {
+                            "guias" : lista
+                        }
+                        vinculaciones = json.dumps(detalle)
+                    print(vinculaciones)
+                    
+                    if tipo_doc == 'FACTURA':
+                        sql2 = 'update nota_venta set vinculaciones = %s where folio = %s'
+                        cursor.execute(sql2 , (vinculaciones,folio))
+                        miConexion.commit()
+
+                    elif tipo_doc == 'BOLETA':
+                        sql2 = 'update nota_venta set vinculaciones = %s where nro_boleta = %s'
+                        cursor.execute(sql2 , (vinculaciones,folio))
+                        miConexion.commit()
+                    print('VINCULO GUIA AÑADIDO CORRECTAMENTE')
+                    return True
+                    
+                else:
+                    print('Nota venta NO encontrada')
+                    return False        
+        finally:
+                miConexion.close()
+
+
 
 class Servidor(QMainWindow):
     servidor = None
