@@ -999,7 +999,7 @@ class MyService(rpyc.Service):
                 cursor.execute(sql , (interno))
                 resultado = cursor.fetchone()
                 if resultado != None:
-                    print(resultado)
+                    #print(resultado)
                     return resultado
                 else:
                     return None   
@@ -1189,7 +1189,80 @@ class MyService(rpyc.Service):
                     return False        
         finally:
                 miConexion.close()
+    def exposed_añadir_vinculo_orden_a_venta(self, tipo_doc , detalle , folio):
+        miConexion = pymysql.connect( host='localhost',
+        user= 'huber', passwd='huber123', db='madenco' )
+        try:
+            with miConexion.cursor() as cursor:
+                resultado = None
+                print('-------------- vinculo orden a venta -------------')
+                if tipo_doc == 'FACTURA':
+                    sql = "SELECT vinculaciones FROM nota_venta WHERE folio = %s "
+                    cursor.execute(sql , (folio))
+                    resultado = cursor.fetchone()
+                elif tipo_doc == 'BOLETA':
+                    sql = "SELECT vinculaciones FROM nota_venta WHERE nro_boleta = %s "
+                    cursor.execute(sql , (folio))
+                    resultado = cursor.fetchone()
+                elif tipo_doc == 'GUIA':
+                    print('NO ES NOTA_DE VENTA, posiblemente una guia')
+                    sql = "SELECT vinculaciones FROM guia WHERE folio = %s "
+                    cursor.execute(sql , (folio))
+                    resultado = cursor.fetchone()
 
+                    
+                print(resultado)
+
+                if resultado != None:
+                    print(f'nota venta: {tipo_doc} encontrada')
+                    if resultado[0] != None:
+                        print('tiene vinculaciones, procediendo a añadir orden')
+                        vinculaciones = json.loads(resultado[0])
+                        try:
+                            vinculaciones["ordenes"].append(detalle)
+
+                        except KeyError:
+                            print('Vinculo a guia no encontrado, creando el vinculo.,.')
+                            lista = []
+                            lista.append(detalle)
+                            vinculaciones["ordenes"] = lista
+
+                        vinculaciones = json.dumps(vinculaciones)
+                        
+                    else:
+                        print('No tiene vinculaciones')
+                        lista = []
+                        lista.append(detalle)
+                        detalle2 = {
+                            "ordenes" : lista
+                        }
+                        vinculaciones = json.dumps(detalle2)
+                    print(vinculaciones)
+                    
+                    if tipo_doc == 'FACTURA':
+                        sql2 = 'update nota_venta set vinculaciones = %s where folio = %s'
+                        cursor.execute(sql2 , (vinculaciones,folio))
+                        miConexion.commit()
+
+                    elif tipo_doc == 'BOLETA':
+                        sql2 = 'update nota_venta set vinculaciones = %s where nro_boleta = %s'
+                        cursor.execute(sql2 , (vinculaciones,folio))
+                        miConexion.commit()
+                    elif tipo_doc == 'GUIA':
+                        sql2 = 'update guia set vinculaciones = %s where folio = %s'
+                        cursor.execute(sql2 , (vinculaciones,folio))
+                        miConexion.commit()
+
+                    print('VINCULO ORDEN DE TRABAJO AÑADIDO CORRECTAMENTE')
+                    print('------------------------------------------------')
+                    return True
+                    
+                else:
+                    print('Nota venta NO encontrada')
+                    return False        
+        finally:
+                miConexion.close()
+    
 
 
 class Servidor(QMainWindow):
