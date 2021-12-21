@@ -28,8 +28,8 @@ class MyService(rpyc.Service):
         user= 'huber', passwd='huber123', db='madenco' )
         try:
             with miConexion.cursor() as cursor:
-                
-                sql = "INSERT INTO nota_venta(interno, folio, nro_boleta, fecha, vendedor, monto_total) VALUES (%s , %s ,%s , %s, %s , %s)"
+                #v5.4 se agrego el estado_retiro y revisor ---> por defecto no retirado y no asignado.
+                sql = "INSERT INTO nota_venta(interno, folio, nro_boleta, fecha, vendedor, monto_total, estado_retiro,revisor) VALUES (%s , %s ,%s , %s, %s , %s,'NO RETIRADO','NO ASIGNADO')"
                 resultado = cursor.execute(sql , ( datos[0] , 0 , datos[1] , datos[2] , datos[3], datos[4] ) )
 
                 if resultado:
@@ -53,8 +53,8 @@ class MyService(rpyc.Service):
         user= 'huber', passwd='huber123', db='madenco' )
         try:
             with miConexion.cursor() as cursor:
-                
-                sql = "INSERT INTO nota_venta(interno, folio, nro_boleta, fecha, vendedor, monto_total,nombre) VALUES (%s , %s ,%s , %s, %s , %s,%s)"
+                #v5.4 se agrego el estado_retiro y revisor ---> por defecto no retirado y no asignado.
+                sql = "INSERT INTO nota_venta(interno, folio, nro_boleta, fecha, vendedor, monto_total,nombre,estado_retiro,revisor) VALUES (%s , %s ,%s , %s, %s , %s,%s,'NO RETIRADO','NO ASIGNADO')"
                 resultado = cursor.execute(sql , ( datos[0] , datos[1] , 0 , datos[2] , datos[3], datos[4] ,datos[5] ) )
                 if resultado:
                     print('Factura: ' + str(datos[1]) +' almacenada correctamente')     
@@ -935,6 +935,10 @@ class MyService(rpyc.Service):
                 cursor.execute( sql )
                 sql = "SELECT * from dimensionador  INTO OUTFILE '" + carpeta +"/dimensionador.csv'  FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' ;" 
                 cursor.execute( sql )
+                sql = "SELECT * from guia  INTO OUTFILE '" + carpeta +"/guia.csv'  FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' ;" 
+                cursor.execute( sql )
+                sql = "SELECT * from nota_credito  INTO OUTFILE '" + carpeta +"/nota_credito.csv'  FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' ;" 
+                cursor.execute( sql )
 
                 return True
         
@@ -975,7 +979,22 @@ class MyService(rpyc.Service):
                     return False        
         finally:
                 miConexion.close()
-    # version 5.4 
+    # version 5.4
+    def exposed_buscar_orden_nombre(self,tipo , nombre ):
+        miConexion = pymysql.connect( host='localhost',
+        user= 'huber', passwd='huber123', db='madenco' )
+        try:
+            with miConexion.cursor() as cursor:
+                print('buscando x:' + nombre)
+                
+                sql = "SELECT nro_orden, interno, fecha_orden,nombre ,fecha_venta, fecha_estimada, extra FROM orden_"+ tipo +" WHERE nombre LIKE '%" + nombre + "%' "
+                
+                cursor.execute(sql)
+                resultado = cursor.fetchall()
+                return resultado
+        finally:
+            miConexion.close() 
+
     def exposed_obtener_guia_fecha(self,inicio , fin):
         miConexion = pymysql.connect( host='localhost',
         user= 'huber', passwd='huber123', db='madenco' )
@@ -1277,6 +1296,7 @@ class Servidor(QMainWindow):
         self.executor = ThreadPoolExecutor(max_workers=2)
         self.btn_iniciar.clicked.connect(self.iniciar)
         self.btn_detener.clicked.connect(self.detener)
+        self.r_localhost.stateChanged.connect(self.cambiar_ip)
 
     def inicializar(self):
         actual = os.path.abspath(os.getcwd())
@@ -1328,6 +1348,13 @@ class Servidor(QMainWindow):
     def detener_servidor(self):
         if self.servidor:
             self.servidor.close()
+    #v5.4 usada para testeo
+    def cambiar_ip(self):
+        if self.r_localhost.isChecked():
+            self.txt_host.setText('127.0.0.1')
+        else:
+            self.txt_host.setText(str(self.direccion_pc))
+
     def closeEvent(self, event):
         self.detener_servidor()
         event.accept()

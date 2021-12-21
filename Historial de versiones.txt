@@ -1,3 +1,9 @@
+
+[Version 5.4 (01-09-2021)]
+- Se agrego funciones para registrar guias y notas de credito, obtencion de las mismas.
+- Se añadio funciones de vinculacion: guia, credito y orden a venta. y orden a guia.
+- Se modifico funcion de respaldo, ahora se respaldan los creditos y guias.
+
 [Version 5.3 (01-09-2021)]
 - Se modifico funcion para registrar usuarios, ahora se les agrego un campo de nombre completo.
 
