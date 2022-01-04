@@ -32,9 +32,9 @@ class MyService(rpyc.Service):
                 sql = "INSERT INTO nota_venta(interno, folio, nro_boleta, fecha, vendedor, monto_total, estado_retiro,revisor) VALUES (%s , %s ,%s , %s, %s , %s,'NO RETIRADO','NO ASIGNADO')"
                 resultado = cursor.execute(sql , ( datos[0] , 0 , datos[1] , datos[2] , datos[3], datos[4] ) )
 
-                if resultado:
+                if resultado:   #SE AGREGA 0 COMO CANT RETIRADA
                     print('Boleta: ' + str(datos[0]) +' almacenada correctamente')     
-                    sql2 = "INSERT INTO item(interno ,cantidad, codigo, descripcion, unitario, total) VALUES (%s , %s ,%s , %s, %s , %s)"
+                    sql2 = "INSERT INTO item(interno ,cantidad, codigo, descripcion, unitario, total,retirado) VALUES (%s , %s ,%s , %s, %s , %s, 0)"
 
                     resultado2 = cursor.executemany(sql2 , items )
                     if resultado2:
@@ -58,7 +58,7 @@ class MyService(rpyc.Service):
                 resultado = cursor.execute(sql , ( datos[0] , datos[1] , 0 , datos[2] , datos[3], datos[4] ,datos[5] ) )
                 if resultado:
                     print('Factura: ' + str(datos[1]) +' almacenada correctamente')     
-                    sql2 = "INSERT INTO item(interno ,cantidad, codigo, descripcion, unitario, total) VALUES (%s , %s ,%s , %s, %s , %s)"
+                    sql2 = "INSERT INTO item(interno ,cantidad, codigo, descripcion, unitario, total,retirado) VALUES (%s , %s ,%s , %s, %s , %s, 0)"
 
                     resultado2 = cursor.executemany(sql2 , items )
                     if resultado2:
@@ -312,12 +312,13 @@ class MyService(rpyc.Service):
                 return resultado
         finally:
             miConexion.close()
+    # MOD ... V5.5.1 SE AGREGO fecha ingreso y trabajador asignado al obtener.
     def exposed_buscar_orden_elab_numero(self,numero):
         miConexion = pymysql.connect( host='localhost',
         user= 'huber', passwd='huber123', db='madenco' )
         try:
             with miConexion.cursor() as cursor:
-                sql = "SELECT nro_orden,nombre,telefono,fecha_orden,fecha_estimada,nro_doc,tipo_doc,contacto,orden_compra,despacho,interno,detalle,fecha_venta,fecha_real,vendedor,observacion ,extra  FROM orden_elaboracion WHERE nro_orden = %s "
+                sql = "SELECT nro_orden,nombre,telefono,fecha_orden,fecha_estimada,nro_doc,tipo_doc,contacto,orden_compra,despacho,interno,detalle,fecha_venta,fecha_real,vendedor,observacion ,extra,fecha_ingreso,trabajador_asignado  FROM orden_elaboracion WHERE nro_orden = %s "
                 cursor.execute(sql , (numero) )
                 resultado = cursor.fetchone()
                 return resultado
@@ -404,12 +405,14 @@ class MyService(rpyc.Service):
                 return resultado
         finally:
             miConexion.close()
+
+    # MOD ... V5.5.1 SE AGREGO fecha ingreso y trabajador asignado al obtener.
     def exposed_buscar_orden_carp_numero(self,numero):
         miConexion = pymysql.connect( host='localhost',
         user= 'huber', passwd='huber123', db='madenco' )
         try:
             with miConexion.cursor() as cursor:
-                sql = "SELECT nro_orden,nombre,telefono,fecha_orden,fecha_estimada,nro_doc,tipo_doc,contacto,orden_compra,despacho,interno,detalle,fecha_venta,fecha_real,vendedor,observacion,extra  FROM orden_carpinteria WHERE nro_orden = %s "
+                sql = "SELECT nro_orden,nombre,telefono,fecha_orden,fecha_estimada,nro_doc,tipo_doc,contacto,orden_compra,despacho,interno,detalle,fecha_venta,fecha_real,vendedor,observacion,extra ,fecha_ingreso,trabajador_asignado FROM orden_carpinteria WHERE nro_orden = %s "
                 cursor.execute(sql , (numero) )
                 resultado = cursor.fetchone()
                 return resultado
@@ -494,12 +497,13 @@ class MyService(rpyc.Service):
                 return resultado
         finally:
             miConexion.close()
+    # MOD ... V5.5.1 SE AGREGO fecha ingreso y trabajador asignado al obtener.
     def exposed_buscar_orden_pall_numero(self,numero):
         miConexion = pymysql.connect( host='localhost',
         user= 'huber', passwd='huber123', db='madenco' )
         try:
             with miConexion.cursor() as cursor:
-                sql = "SELECT nro_orden,nombre,telefono,fecha_orden,fecha_estimada,nro_doc,tipo_doc,contacto,orden_compra,despacho,interno,detalle,fecha_venta,fecha_real,vendedor,observacion,extra  FROM orden_pallets WHERE nro_orden = %s "
+                sql = "SELECT nro_orden,nombre,telefono,fecha_orden,fecha_estimada,nro_doc,tipo_doc,contacto,orden_compra,despacho,interno,detalle,fecha_venta,fecha_real,vendedor,observacion,extra,fecha_ingreso,trabajador_asignado  FROM orden_pallets WHERE nro_orden = %s "
                 cursor.execute(sql , (numero) )
                 resultado = cursor.fetchone()
                 return resultado
@@ -602,65 +606,7 @@ class MyService(rpyc.Service):
         finally:
             miConexion.close()
 
-    def exposed_registrar_dimensionador(self, nombre, telefono, inicio):
-        miConexion = pymysql.connect( host='localhost',
-        user= 'huber', passwd='huber123', db='madenco' )
-        try:
-            with miConexion.cursor() as cursor:
-                sql = "INSERT INTO dimensionador(nombre, telefono, fecha_inicio, estado) VALUES ( %s ,%s , %s , 'ACTIVO')"
-
-                resultado = cursor.execute(sql , ( nombre, telefono, inicio) )
-                if resultado:
-                    miConexion.commit()
-                    print('DIMENSIONADOR REGISTRADO')
-                    return True   
-                else:
-                    return False
-        finally:
-            miConexion.close()
-    def exposed_obtener_dimensionador_activo(self):
-        miConexion = pymysql.connect( host='localhost',
-        user= 'huber', passwd='huber123', db='madenco' )
-        try:
-            with miConexion.cursor() as cursor:
-                sql = "SELECT nombre, telefono, fecha_inicio, nro_dimensionador FROM dimensionador WHERE estado = 'ACTIVO'   "
-                cursor.execute( sql )
-                resultado = cursor.fetchall()
-                return resultado
-        finally:
-            miConexion.close()
-    def exposed_actualizar_dimensionador(self,nombre,telefono,inicio,nro_dimensionador):
-        miConexion = pymysql.connect( host='localhost',
-        user= 'huber', passwd='huber123', db='madenco' )
-        try:
-            with miConexion.cursor() as cursor:
-                sql = " UPDATE dimensionador SET nombre = %s , telefono = %s , fecha_inicio =  %s WHERE nro_dimensionador = %s "
-
-                resultado = cursor.execute(sql , ( nombre, telefono, inicio, nro_dimensionador ) )
-                if resultado:
-                    miConexion.commit()
-                    print('Dimensionador actualizado')
-                    return True   
-                else:
-                    return False
-        finally:
-            miConexion.close()
-    def exposed_retirar_dimensionador(self, nro_dimensionador,termino ):
-        miConexion = pymysql.connect( host='localhost',
-        user= 'huber', passwd='huber123', db='madenco' )
-        try:
-            with miConexion.cursor() as cursor:
-                sql = " UPDATE dimensionador SET estado = 'NO ACTIVO' , fecha_termino = %s WHERE nro_dimensionador = %s "
-
-                resultado = cursor.execute(sql , (termino, nro_dimensionador ) )
-                if resultado:
-                    miConexion.commit()
-                    print('Dimensionador RETIRADO')
-                    return True   
-                else:
-                    return False
-        finally:
-            miConexion.close()
+    #-------- gestion dimensionador olvidada, ahora es traajador desde la v5.5.1 ----------------
 
     def exposed_registrar_usuario(self, nombre, contra, telefono, inicio, super,tipo,funciones,full_nom):
         miConexion = pymysql.connect( host='localhost',
@@ -933,7 +879,7 @@ class MyService(rpyc.Service):
                 cursor.execute( sql )
                 sql = "SELECT * from usuario  INTO OUTFILE '" + carpeta +"/usuario.csv'  FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' ;" 
                 cursor.execute( sql )
-                sql = "SELECT * from dimensionador  INTO OUTFILE '" + carpeta +"/dimensionador.csv'  FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' ;" 
+                sql = "SELECT * from trabajador  INTO OUTFILE '" + carpeta +"/trabajador.csv'  FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' ;" 
                 cursor.execute( sql )
                 sql = "SELECT * from guia  INTO OUTFILE '" + carpeta +"/guia.csv'  FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' ;" 
                 cursor.execute( sql )
@@ -1281,6 +1227,101 @@ class MyService(rpyc.Service):
                     return False        
         finally:
                 miConexion.close()
+    # ------------ GESTION DE TRABAJADOR V5.5.1 --------
+    def exposed_registrar_trabajador(self, nombre, telefono, inicio, area):
+        miConexion = pymysql.connect( host='localhost',
+        user= 'huber', passwd='huber123', db='madenco' )
+        try:
+            with miConexion.cursor() as cursor:
+                sql = "INSERT INTO trabajador(nombre, telefono, fecha_inicio, area, estado) VALUES ( %s ,%s , %s, %s , 'ACTIVO')"
+
+                resultado = cursor.execute(sql , ( nombre, telefono, inicio, area) )
+                if resultado:
+                    miConexion.commit()
+                    print('trabajador de: '+ area +' REGISTRADO')
+                    return True   
+                else:
+                    return False
+        finally:
+            miConexion.close()
+
+    def exposed_obtener_trabajador_activo(self, area):
+        miConexion = pymysql.connect( host='localhost',
+        user= 'huber', passwd='huber123', db='madenco' )
+        try:
+            with miConexion.cursor() as cursor:
+                sql = "SELECT nombre, telefono, fecha_inicio, nro_trabajador ,area , estado FROM trabajador WHERE estado = 'ACTIVO' AND area = '" + area +"'"
+                cursor.execute( sql )
+                resultado = cursor.fetchall()
+                return resultado
+        finally:
+            miConexion.close()
+
+    def exposed_actualizar_trabajador(self,nombre,telefono,inicio,nro_trabajador):
+        miConexion = pymysql.connect( host='localhost',
+        user= 'huber', passwd='huber123', db='madenco' )
+        try:
+            with miConexion.cursor() as cursor:
+                sql = " UPDATE trabajador SET nombre = %s , telefono = %s , fecha_inicio =  %s WHERE nro_trabajador = %s "
+
+                resultado = cursor.execute(sql , ( nombre, telefono, inicio, nro_trabajador ) )
+                if resultado:
+                    miConexion.commit()
+                    print('Trabajador actualizado')
+                    return True   
+                else:
+                    return False
+        finally:
+            miConexion.close()
+    def exposed_retirar_trabajador(self, nro_trabajador ,termino ):
+        miConexion = pymysql.connect( host='localhost',
+        user= 'huber', passwd='huber123', db='madenco' )
+        try:
+            with miConexion.cursor() as cursor:
+                sql = " UPDATE trabajador SET estado = 'NO ACTIVO' , fecha_termino = %s WHERE nro_trabajador = %s "
+
+                resultado = cursor.execute(sql , (termino, nro_trabajador ) )
+                if resultado:
+                    miConexion.commit()
+                    print('Trabajador RETIRADO')
+                    return True   
+                else:
+                    return False
+        finally:
+            miConexion.close()
+
+    def exposed_actualizar_orden_fecha_real(self,tipo ,orden, real ): #UTILIZADA POR EL CLIENTE2
+        miConexion = pymysql.connect( host='localhost',
+        user= 'huber', passwd='huber123', db='madenco' )
+        try:
+            with miConexion.cursor() as cursor:
+                sql = "UPDATE orden_"+ tipo +" SET fecha_real = '"+ real +  "' WHERE nro_orden = " + orden
+                #print(sql)
+                resultado = cursor.execute(sql)
+                if resultado:
+                    miConexion.commit()
+                    print('Fecha real de orden '+ tipo +'  actualizada')
+                    return True   
+                else:
+                    return False
+        finally:
+            miConexion.close()
+    def exposed_actualizar_orden_ingreso_trabajador(self,tipo ,orden, ingreso,trabajador ): #UTILIZADA POR EL CLIENTE2
+        miConexion = pymysql.connect( host='localhost',
+        user= 'huber', passwd='huber123', db='madenco' )
+        try:
+            with miConexion.cursor() as cursor:
+                sql = "UPDATE orden_"+ tipo +" SET trabajador_asignado = '"+ trabajador +  "' , fecha_ingreso = '"+ ingreso +"' WHERE nro_orden = " + orden
+                #print(sql)
+                resultado = cursor.execute(sql)
+                if resultado:
+                    miConexion.commit()
+                    print('Fecha de Ingreso y trabajador de Orden de '+ tipo +' actualizado')
+                    return True   
+                else:
+                    return False
+        finally:
+            miConexion.close()
     
 
 
