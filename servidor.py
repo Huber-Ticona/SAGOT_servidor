@@ -722,7 +722,7 @@ class MyService(rpyc.Service):
         user= 'huber', passwd='huber123', db='madenco' )
         try:
             with miConexion.cursor() as cursor:
-                sql = "SELECT nro_orden,nombre,telefono,fecha_orden,fecha_estimada,fecha_real,nro_doc,tipo_doc,contacto,orden_compra,despacho,interno,detalle,fecha_venta,vendedor,observacion,extra  FROM orden_elaboracion WHERE fecha_orden BETWEEN %s AND %s "
+                sql = "SELECT nro_orden,nombre,telefono,fecha_orden,fecha_estimada,fecha_real,nro_doc,tipo_doc,contacto,orden_compra,despacho,interno,detalle,fecha_venta,vendedor,observacion,extra,trabajador_asignado,fecha_ingreso  FROM orden_elaboracion WHERE fecha_orden BETWEEN %s AND %s "
                 cursor.execute( sql , (inicio, termino) )
                 resultado = cursor.fetchall()
                 return resultado
@@ -734,7 +734,7 @@ class MyService(rpyc.Service):
         user= 'huber', passwd='huber123', db='madenco' )
         try:
             with miConexion.cursor() as cursor:
-                sql = "SELECT nro_orden,nombre,telefono,fecha_orden,fecha_estimada,fecha_real,nro_doc,tipo_doc,contacto,orden_compra,despacho,interno,detalle,fecha_venta,vendedor,observacion,extra  FROM orden_carpinteria WHERE fecha_orden BETWEEN %s AND %s "
+                sql = "SELECT nro_orden,nombre,telefono,fecha_orden,fecha_estimada,fecha_real,nro_doc,tipo_doc,contacto,orden_compra,despacho,interno,detalle,fecha_venta,vendedor,observacion,extra,trabajador_asignado,fecha_ingreso  FROM orden_carpinteria WHERE fecha_orden BETWEEN %s AND %s "
                 cursor.execute( sql , (inicio, termino) )
                 resultado = cursor.fetchall()
                 return resultado
@@ -746,7 +746,7 @@ class MyService(rpyc.Service):
         user= 'huber', passwd='huber123', db='madenco' )
         try:
             with miConexion.cursor() as cursor:
-                sql = "SELECT nro_orden,nombre,telefono,fecha_orden,fecha_estimada,fecha_real,nro_doc,tipo_doc,contacto,orden_compra,despacho,interno,detalle,fecha_venta,vendedor,observacion,extra FROM orden_pallets WHERE fecha_orden BETWEEN %s AND %s "
+                sql = "SELECT nro_orden,nombre,telefono,fecha_orden,fecha_estimada,fecha_real,nro_doc,tipo_doc,contacto,orden_compra,despacho,interno,detalle,fecha_venta,vendedor,observacion,extra,trabajador_asignado,fecha_ingreso FROM orden_pallets WHERE fecha_orden BETWEEN %s AND %s "
                 cursor.execute( sql , (inicio, termino) )
                 resultado = cursor.fetchall()
                 return resultado

@@ -29,8 +29,8 @@ LINES TERMINATED BY '\n'
 
 esta version tambien es facil
 -----------------------------------------
-LOAD DATA LOCAL INFILE 'C:/Users/super/Desktop/Hasta_18-12-2021/nota_venta.csv' 
-INTO TABLE nota_venta
+LOAD DATA LOCAL INFILE 'C:/Users/super/Desktop/Hasta_18-12-2021/dim.csv' 
+INTO TABLE orden_dimensionado
 FIELDS TERMINATED BY ';' 
 LINES TERMINATED BY '\n'
  

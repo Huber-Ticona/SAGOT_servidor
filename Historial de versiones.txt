@@ -1,3 +1,8 @@
+[Version 5.4.1 (4-1-2022)]
+- Se agrego nuevas funciones para el personal de area.
+- Funciones para gestionar trabajadores.
+- Funciones para asignar fecha ingreso, trabajador y fecha real a todas las ordenes.
+- Se actualizo el backup, ahora se respalda los trabajadores tambien. Los dimensionadores ya no   se respaldan (version antigua, ahora todos son trabajadores)
 
 [Version 5.4 (20-12-2021)]
 - Se agrego funciones para registrar guias y notas de credito, obtencion de las mismas.
